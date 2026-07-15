@@ -1,0 +1,5 @@
+Se (classification sensitivity),Underreporting (1-Se),Corrected ATE (per 1k),Corrected CI lo (per 1k),Corrected CI hi (per 1k)
+1.0000,0.0000,2.3214,-0.2341,4.8769
+0.9000,0.1000,2.5793,-0.2601,5.4188
+0.8000,0.2000,2.9018,-0.2926,6.0961
+0.7000,0.3000,3.3163,-0.3344,6.9670

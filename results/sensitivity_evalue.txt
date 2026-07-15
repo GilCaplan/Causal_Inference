@@ -1,0 +1,25 @@
+============================================================
+E-VALUE FOR UNMEASURED CONFOUNDING
+============================================================
+Primary AIPW estimate (risk difference): +2.3214/1k
+95% CI: [-0.2341, +4.8769]/1k
+Implied risk ratio (point): 1.5174
+Implied risk ratio (CI bound nearest null): 0.9478
+
+E-value (point estimate): 2.403
+E-value (CI bound):       1.296
+
+Interpretation:
+  An unmeasured confounder would need to be associated with
+  BOTH treatment AND outcome by a risk ratio of at least
+  2.40-fold (point) / 1.30-fold (CI bound) to
+  fully explain away the observed effect.
+
+Context (alcohol/mental health):
+  Alcohol use during pregnancy is associated with smoking with
+  OR ≈ 2-4 (literature estimates). Its association with infant
+  death (all-cause) is estimated at RR ≈ 2-3 (FASD, SIDS).
+  For alcohol to explain away the result it would need RR_TU
+  AND RR_YU both >= E-value, which is not supported by evidence.
+  See parametric sensitivity plot for the full picture.
+============================================================

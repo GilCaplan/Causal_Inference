@@ -1,0 +1,3 @@
+Sample,N,N_treated,ATE_1k,SE_1k,CI_lo_1k,CI_hi_1k
+Full analytic sample,3024118,166623,2.3214,1.3038,-0.2341,4.8769
+Singletons only (DPLURAL=1),2920285,162117,2.7088,1.3343,0.0936,5.3239

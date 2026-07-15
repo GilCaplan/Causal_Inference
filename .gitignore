@@ -5,8 +5,11 @@ __pycache__/
 .venv/
 venv/
 
-# Raw ACS state CSVs — regenerate via scripts/download_folktables.py
+# Raw CDC data files — large; re-download per DATA_SOURCE.md
 data/
-*.parquet
-acs_2018_slim.csv
-acs_2018_slim.csv.gz
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.synctex.gz

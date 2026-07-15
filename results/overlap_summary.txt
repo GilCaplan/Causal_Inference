@@ -1,0 +1,21 @@
+============================================================
+PROPENSITY SCORE OVERLAP DIAGNOSTICS
+============================================================
+Analytic sample (after all filters): 3,024,118
+  Treated (T=1):  166,623  (5.51%)
+  Control (T=0):  2,857,495  (94.49%)
+
+PS distribution:
+  Treated -- mean=0.1947  sd=0.1420  min=0.0002  max=0.8015
+  Control -- mean=0.0470  sd=0.0747  min=0.0001  max=0.8023
+
+Common support region (max of mins to min of maxs):
+  [0.0002, 0.8015]
+
+Trimming impact (units outside treated PS range):
+  1st/99th percentile trim: 281,901 units removed (9.32%)
+  5th/95th percentile trim: 1,127,776 units removed (37.29%)
+
+% of treated with PS below median PS of controls: 7.4%
+  (should be low; high value = poor overlap)
+============================================================

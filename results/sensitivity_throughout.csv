@@ -1,0 +1,4 @@
+Definition,N_treated,ATE_1k,SE_1k,CI_lo_1k,CI_hi_1k
+Primary (CIG0≥1 + all 3 tri),166623,2.3434,1.3044,-0.2132,4.9001
+All 3 trimest. only (no CIG0),167285,2.3124,1.2887,-0.2134,4.8382
+Any 2-of-3 trimesters ≥1,180843,2.3966,1.1854,0.0732,4.7200

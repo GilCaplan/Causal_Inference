@@ -1,0 +1,13 @@
+Variable,SMD_raw,SMD_ipw
+Mother's Age,-0.3627,0.1807
+Mother's Education,-0.7998,0.3306
+Race/Hispanic Origin,-0.5789,0.4196
+Marital Status,0.6490,-0.1923
+WIC Participation,0.5235,-0.2396
+Payment/Insurance,-0.4707,0.2518
+Pre-pregnancy BMI,0.0666,-0.0172
+Father's Education,-0.7270,0.3323
+Father's Age Group,-0.1712,0.1195
+Pre-preg. Diabetes,0.0259,0.0138
+Pre-preg. Hypertension,0.0377,-0.0188
+Parity (prior live births),0.2588,-0.1155

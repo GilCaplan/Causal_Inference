@@ -1,0 +1,4 @@
+Label,Threshold,N_treated,N_control,ATE_1k,SE_1k,CI_lo_1k,CI_hi_1k
+≥1 cig/day (any; primary),1,166623,2857495,2.3434,1.3044,-0.2132,4.9001
+≥6 cig/day (≥1 pack/3),2,100018,2857495,3.4298,1.8528,-0.2016,7.0613
+≥11 cig/day (half-pack+),3,40250,2857495,2.9210,1.1253,0.7155,5.1265
