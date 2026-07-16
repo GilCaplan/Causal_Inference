@@ -1,0 +1,6 @@
+Estimator,ATE_1k,lambda_star_CI,lambda_star_point
+S-Learner,2.5400,,0.0339
+T-Learner,2.7600,,0.0369
+IPW (Hajek),1.5120,0.0000,0.0202
+AIPW / DR,1.4320,0.0000,0.0191
+PS Matching,3.6230,0.0406,0.0484

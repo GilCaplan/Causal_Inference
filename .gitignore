@@ -8,6 +8,13 @@ venv/
 # Raw CDC data files — large; re-download per DATA_SOURCE.md
 data/
 
+# Large intermediate (propensity + outcome scores); regenerate via estimation.py
+results/scores.parquet
+
+# Partner notebook + course handout — contain student ID / not for public repo
+Causal_Inference_Project_Jeremy.ipynb
+instructions.pdf
+
 # LaTeX build artifacts
 *.aux
 *.log

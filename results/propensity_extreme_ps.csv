@@ -1,0 +1,9 @@
+group,threshold,n_extreme,n_group,pct_of_group,risky_for_ipw
+treated,< 0.01,5323,147963,3.5975,True
+treated,< 0.05,22514,147963,15.2160,True
+treated,> 0.95,0,147963,0.0000,False
+treated,> 0.99,0,147963,0.0000,False
+control,< 0.01,1464396,2857495,51.2475,False
+control,< 0.05,2239943,2857495,78.3883,False
+control,> 0.95,0,2857495,0.0000,True
+control,> 0.99,0,2857495,0.0000,True

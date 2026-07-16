@@ -1,18 +1,18 @@
 ============================================================
 E-VALUE FOR UNMEASURED CONFOUNDING
 ============================================================
-Primary AIPW estimate (risk difference): +2.3214/1k
-95% CI: [-0.2341, +4.8769]/1k
-Implied risk ratio (point): 1.5174
-Implied risk ratio (CI bound nearest null): 0.9478
+Primary AIPW estimate (risk difference): +1.4323/1k
+95% CI: [-0.2506, +3.1151]/1k
+Implied risk ratio (point): 1.3192
+Implied risk ratio (CI bound nearest null): 0.9442
 
-E-value (point estimate): 2.403
-E-value (CI bound):       1.296
+E-value (point estimate): 1.968
+E-value (CI bound):       1.309
 
 Interpretation:
   An unmeasured confounder would need to be associated with
   BOTH treatment AND outcome by a risk ratio of at least
-  2.40-fold (point) / 1.30-fold (CI bound) to
+  1.97-fold (point) / 1.31-fold (CI bound) to
   fully explain away the observed effect.
 
 Context (alcohol/mental health):

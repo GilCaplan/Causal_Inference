@@ -1,4 +1,4 @@
 Trim,N,ATE_1k,SE_1k,CI_lo_1k,CI_hi_1k
-None (full sample),3024118,2.3214,1.3038,-0.2341,4.8769
-1th/99th pct of treated PS,2742217,2.1145,0.4497,1.2332,2.9959
-5th/95th pct of treated PS,1896342,2.5837,0.3393,1.9188,3.2487
+None (full sample),3005458,1.4323,0.8586,-0.2506,3.1151
+1th/99th pct of treated PS,2131761,3.3524,0.5817,2.2122,4.4925
+5th/95th pct of treated PS,1327644,2.3246,0.3409,1.6564,2.9928

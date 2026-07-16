@@ -1,35 +1,54 @@
 ======================================================================
 SENSITIVITY ANALYSIS SUMMARY
 ======================================================================
-Primary AIPW ATE: +2.3214/1k  95% CI [-0.2341, +4.8769]
+Primary AIPW ATE: +1.4323/1k  95% CI [-0.2506, +3.1151]
 
 1. E-value (hidden confounder must have RR ≥ X with BOTH T and Y):
-   Point estimate E-value: 2.40
-   CI bound E-value:       1.30
+   Point estimate E-value: 1.97
+   CI bound E-value:       1.31
    (Literature: alcohol RR_T ≈ 2-4, RR_Y ≈ 2-3 → insufficient to explain away)
 
 2. Dose-response (monotone increase expected if causal):
-   ≥1 cig/day (any; primary)             : ATE=+2.3434  [-0.2132, +4.9001]
-   ≥6 cig/day (≥1 pack/3)                : ATE=+3.4298  [-0.2016, +7.0613]
-   ≥11 cig/day (half-pack+)              : ATE=+2.9210  [+0.7155, +5.1265]
+   ≥1 cig/day (any; primary)             : ATE=+1.4970  [-0.2050, +3.1989]
+   ≥6 cig/day (≥1 pack/3)                : ATE=+3.1631  [-1.0002, +7.3263]
+   ≥11 cig/day (half-pack+)              : ATE=+6.4604  [+1.2775, +11.6432]
 
 3. PS trimming:
-   None (full sample)                        : ATE=+2.3214  [-0.2341, +4.8769]
-   1th/99th pct of treated PS                : ATE=+2.1145  [+1.2332, +2.9959]
-   5th/95th pct of treated PS                : ATE=+2.5837  [+1.9188, +3.2487]
+   None (full sample)                        : ATE=+1.4323  [-0.2506, +3.1151]
+   1th/99th pct of treated PS                : ATE=+3.3524  [+2.2122, +4.4925]
+   5th/95th pct of treated PS                : ATE=+2.3246  [+1.6564, +2.9928]
 
 4. 'Throughout' operationalisation:
-   Primary (CIG0≥1 + all 3 tri)              : ATE=+2.3434  [-0.2132, +4.9001]
-   All 3 trimest. only (no CIG0)             : ATE=+2.3124  [-0.2134, +4.8382]
-   Any 2-of-3 trimesters ≥1                  : ATE=+2.3966  [+0.0732, +4.7200]
+   Primary (CIG0≥1 + all 3 tri)              : ATE=+1.4970  [-0.2050, +3.1989]
+   All 3 trimest. only (no CIG0)             : ATE=+1.4668  [-0.2260, +3.1596]
+   Any 2-of-3 trimesters ≥1                  : ATE=+1.2289  [-0.2504, +2.7082]
 
 5. Misclassification correction (nondifferential, Se = P(T_obs=1|T_true=1)):
-   Se=1.00  corrected ATE=+2.3214  [-0.2341, +4.8769]
-   Se=0.90  corrected ATE=+2.5793  [-0.2601, +5.4188]
-   Se=0.80  corrected ATE=+2.9018  [-0.2926, +6.0961]
-   Se=0.70  corrected ATE=+3.3163  [-0.3344, +6.9670]
+   Se=1.00  corrected ATE=+1.4323  [-0.2506, +3.1151]
+   Se=0.90  corrected ATE=+1.5914  [-0.2784, +3.4613]
+   Se=0.80  corrected ATE=+1.7904  [-0.3132, +3.8939]
+   Se=0.70  corrected ATE=+2.0461  [-0.3580, +4.4502]
 
 6. Singleton restriction (DPLURAL=1 excludes twins/multiples):
-   Full analytic sample                      : ATE=+2.3214  [-0.2341, +4.8769]
-   Singletons only (DPLURAL=1)               : ATE=+2.7088  [+0.0936, +5.3239]
+   Full analytic sample                      : ATE=+1.4323  [-0.2506, +3.1151]
+   Singletons only (DPLURAL=1)               : ATE=+1.7349  [+0.0539, +3.4159]
+
+7. Hidden-confounding tipping point (TA09; λ in within-group outcome SDs):
+   ATE shift per unit λ = -0.074845
+   S-Learner         : λ*(CI)=n/a      λ*(point)=0.0339
+   T-Learner         : λ*(CI)=n/a      λ*(point)=0.0369
+   IPW (Hajek)       : λ*(CI)=0.0000   λ*(point)=0.0202
+   AIPW / DR         : λ*(CI)=0.0000   λ*(point)=0.0191
+   PS Matching       : λ*(CI)=0.0406   λ*(point)=0.0484
+
+8. PS-matching robustness grid (k × caliper):
+   k=1  caliper=0.1SD: ATT=+3.6225  [+3.0257, +4.2194]  (100.0% matched)
+   k=1  caliper=0.2SD: ATT=+3.6225  [+3.0257, +4.2194]  (100.0% matched)
+   k=1  caliper=0.5SD: ATT=+3.6225  [+3.0257, +4.2194]  (100.0% matched)
+   k=5  caliper=0.1SD: ATT=+3.3265  [+2.8225, +3.8305]  (100.0% matched)
+   k=5  caliper=0.2SD: ATT=+3.3265  [+2.8225, +3.8305]  (100.0% matched)
+   k=5  caliper=0.5SD: ATT=+3.3265  [+2.8225, +3.8305]  (100.0% matched)
+   k=10 caliper=0.1SD: ATT=+3.1948  [+2.7048, +3.6847]  (100.0% matched)
+   k=10 caliper=0.2SD: ATT=+3.1947  [+2.7048, +3.6847]  (100.0% matched)
+   k=10 caliper=0.5SD: ATT=+3.1947  [+2.7048, +3.6847]  (100.0% matched)
 ======================================================================

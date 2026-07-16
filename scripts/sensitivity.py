@@ -217,10 +217,10 @@ threshold_labels = {
 
 dose_rows = []
 for thresh, label in threshold_labels.items():
-    treated_mask = ((df_base["CIG0_R"] >= thresh) &
-                    (df_base["CIG1_R"] >= thresh) &
-                    (df_base["CIG2_R"] >= thresh) &
-                    (df_base["CIG3_R"] >= thresh))
+    treated_mask = (df_base["CIG0_R"].between(thresh, 5) &
+                    df_base["CIG1_R"].between(thresh, 5) &
+                    df_base["CIG2_R"].between(thresh, 5) &
+                    df_base["CIG3_R"].between(thresh, 5))
     control_mask = (df_base["CIG0_R"] == 0) & (df_base["CIG_REC"] == "N")
     mask = treated_mask | control_mask
     T_d = treated_mask[mask].values.astype(int)
@@ -309,14 +309,15 @@ print("\n'Throughout pregnancy' operationalisation sensitivity...")
 
 throughout_defs = {
     "Primary (CIG0≥1 + all 3 tri)": lambda d: (
-        (d["CIG0_R"] >= 1) & (d["CIG1_R"] >= 1) &
-        (d["CIG2_R"] >= 1) & (d["CIG3_R"] >= 1)),
+        d["CIG0_R"].between(1, 5) & d["CIG1_R"].between(1, 5) &
+        d["CIG2_R"].between(1, 5) & d["CIG3_R"].between(1, 5)),
     "All 3 trimest. only (no CIG0)": lambda d: (
-        (d["CIG1_R"] >= 1) & (d["CIG2_R"] >= 1) & (d["CIG3_R"] >= 1)),
+        d["CIG1_R"].between(1, 5) & d["CIG2_R"].between(1, 5) &
+        d["CIG3_R"].between(1, 5)),
     "Any 2-of-3 trimesters ≥1": lambda d: (
-        ((d["CIG1_R"] >= 1).astype(int) +
-         (d["CIG2_R"] >= 1).astype(int) +
-         (d["CIG3_R"] >= 1).astype(int)) >= 2),
+        (d["CIG1_R"].between(1, 5).astype(int) +
+         d["CIG2_R"].between(1, 5).astype(int) +
+         d["CIG3_R"].between(1, 5).astype(int)) >= 2),
 }
 
 throughout_rows = []
@@ -387,8 +388,8 @@ print("\n6. Singleton restriction (DPLURAL = '1')...")
 df_base, X_base = load_base(DATA)
 
 # Apply treatment / control definition (same as main analysis)
-treated_mask = ((df_base["CIG0_R"] >= 1) & (df_base["CIG1_R"] >= 1) &
-                (df_base["CIG2_R"] >= 1) & (df_base["CIG3_R"] >= 1))
+treated_mask = (df_base["CIG0_R"].between(1, 5) & df_base["CIG1_R"].between(1, 5) &
+                df_base["CIG2_R"].between(1, 5) & df_base["CIG3_R"].between(1, 5))
 control_mask = (df_base["CIG0_R"] == 0) & (df_base["CIG_REC"] == "N")
 df_base = df_base[treated_mask | control_mask].copy()
 X_base  = X_base.loc[df_base.index]
@@ -437,6 +438,119 @@ singleton_df = pd.DataFrame(singleton_rows)
 singleton_df.to_csv(os.path.join(OUT_DIR, "sensitivity_singleton.csv"),
                     index=False, float_format="%.4f")
 print("  Saved → results/sensitivity_singleton.csv")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 7. HIDDEN-CONFOUNDING TIPPING POINT  (TA09 / Lecture 9 framework)
+#
+# An unmeasured confounder shifts the unobserved potential outcomes by
+# λ·σ_t(X) (one within-group SD per unit λ).  The induced bias in the ATE is
+#   λ · ( E[σ0(X)·e(X)] − E[σ1(X)·(1−e(X))] )
+# λ* is the smallest confounding strength at which the estimate is no longer
+# distinguishable from zero.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+print("\n7. Hidden-confounding tipping point (TA09 framework)...")
+
+sigma1 = np.sqrt(np.clip(mu1_main * (1 - mu1_main), 0, None))
+sigma0 = np.sqrt(np.clip(mu0_main * (1 - mu0_main), 0, None))
+bias1_unit = np.mean(sigma1 * (1 - e_main))
+bias0_unit = np.mean(sigma0 * e_main)
+corr_per_lambda = bias0_unit - bias1_unit
+
+print(f"  E[sigma1(X)(1-e(X))] = {bias1_unit:.6f}")
+print(f"  E[sigma0(X)e(X)]     = {bias0_unit:.6f}")
+print(f"  ATE shift per unit lambda = {corr_per_lambda:+.6f}")
+
+est_df = pd.read_csv(os.path.join(OUT_DIR, "estimates.csv"))
+lambdas = np.linspace(-0.5, 0.5, 5001)
+
+tip_rows = []
+for _, r in est_df.iterrows():
+    ate_e, lo_e, hi_e = r["Estimate"], r["CI_lo"], r["CI_hi"]
+    adj_ate = ate_e + lambdas * corr_per_lambda
+    adj_lo  = lo_e  + lambdas * corr_per_lambda
+    adj_hi  = hi_e  + lambdas * corr_per_lambda
+    crosses = (adj_lo <= 0) & (adj_hi >= 0)
+    lam_ci    = np.abs(lambdas[crosses]).min() if crosses.any() else np.nan
+    lam_point = abs(ate_e / corr_per_lambda)
+    tip_rows.append({
+        "Estimator":        r["Estimator"],
+        "ATE_1k":           ate_e * 1000,
+        "lambda_star_CI":   lam_ci,
+        "lambda_star_point": lam_point,
+    })
+    lam_ci_s = f"{lam_ci:.4f}" if np.isfinite(lam_ci) else "n/a"
+    print(f"  {r['Estimator']:<18} λ*(CI crosses 0)={lam_ci_s:<8} "
+          f"λ*(point=0)={lam_point:.4f}")
+
+tip_df = pd.DataFrame(tip_rows)
+tip_df.to_csv(os.path.join(OUT_DIR, "sensitivity_tipping_point.csv"),
+              index=False, float_format="%.4f")
+print("  Saved → results/sensitivity_tipping_point.csv")
+
+# Figure: adjusted primary AIPW estimate vs lambda
+aipw_row = est_df[est_df["Estimator"] == "AIPW / DR"].iloc[0]
+lam_plot = np.linspace(0, 0.25, 500)
+adj  = (aipw_row["Estimate"] + lam_plot * corr_per_lambda) * 1000
+lo_p = (aipw_row["CI_lo"]    + lam_plot * corr_per_lambda) * 1000
+hi_p = (aipw_row["CI_hi"]    + lam_plot * corr_per_lambda) * 1000
+
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.plot(lam_plot, adj, color="#C00000", lw=2, label="Adjusted AIPW ATE")
+ax.fill_between(lam_plot, lo_p, hi_p, color="#C00000", alpha=0.15,
+                label="95% CI")
+ax.axhline(0, color="black", lw=1, ls="--", alpha=0.6)
+tip_pt = abs(aipw_row["Estimate"] / corr_per_lambda)
+ax.axvline(tip_pt, color="#5B8DB8", lw=1.5, ls=":",
+           label=f"λ* (point) = {tip_pt:.3f}")
+ax.set_xlabel("Confounding strength λ (within-group SDs of outcome)")
+ax.set_ylabel("Adjusted ATE (deaths per 1,000 births)")
+ax.set_title("Hidden-confounder tipping point — primary AIPW estimator")
+ax.legend(fontsize=8)
+ax.grid(alpha=0.25)
+plt.tight_layout()
+fig.savefig(os.path.join(OUT_DIR_IMGS, "sensitivity_tipping_point.png"), dpi=150)
+plt.close()
+print("  Saved → results/imgs/sensitivity_tipping_point.png")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 8. PS-MATCHING ROBUSTNESS GRID  (k neighbours × caliper width)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+print("\n8. PS-matching robustness grid (k × caliper)...")
+from scipy.spatial import cKDTree
+
+logit_main = sc["logit_ps"].values
+idx_t_g = np.where(T_main == 1)[0]
+idx_c_g = np.where(T_main == 0)[0]
+tree_g  = cKDTree(logit_main[idx_c_g].reshape(-1, 1))
+sd_lt   = np.std(logit_main)
+
+psm_rows = []
+for k in [1, 5, 10]:
+    dists_g, match_g = tree_g.query(logit_main[idx_t_g].reshape(-1, 1), k=k)
+    dists_g = dists_g.reshape(len(idx_t_g), k)
+    match_g = match_g.reshape(len(idx_t_g), k)
+    y_ctrl_mean = Y_main[idx_c_g[match_g]].astype(float).mean(axis=1)
+    mean_dist   = dists_g.mean(axis=1)
+    for cal in [0.1, 0.2, 0.5]:
+        keep = mean_dist <= cal * sd_lt
+        diff_g = Y_main[idx_t_g[keep]].astype(float) - y_ctrl_mean[keep]
+        att_g  = diff_g.mean()
+        se_g   = diff_g.std(ddof=1) / np.sqrt(len(diff_g))
+        psm_rows.append({
+            "k": k, "caliper_SD": cal,
+            "ATT_1k":   att_g * 1000,
+            "CI_lo_1k": (att_g - 1.96 * se_g) * 1000,
+            "CI_hi_1k": (att_g + 1.96 * se_g) * 1000,
+            "n_matched": int(keep.sum()),
+            "pct_matched": 100 * keep.mean(),
+        })
+        print(f"  k={k:<2} caliper={cal:.1f}SD  ATT={att_g*1000:+.4f}/1k  "
+              f"matched {keep.sum():,} ({100*keep.mean():.1f}%)")
+
+psm_df = pd.DataFrame(psm_rows)
+psm_df.to_csv(os.path.join(OUT_DIR, "sensitivity_psm_grid.csv"),
+              index=False, float_format="%.4f")
+print("  Saved → results/sensitivity_psm_grid.csv")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Summary
@@ -493,6 +607,23 @@ for r in singleton_rows:
     summary_lines.append(
         f"   {r['Sample']:<42}: ATE={r['ATE_1k']:+.4f}  "
         f"[{r['CI_lo_1k']:+.4f}, {r['CI_hi_1k']:+.4f}]")
+summary_lines += [
+    "",
+    "7. Hidden-confounding tipping point (TA09; λ in within-group outcome SDs):",
+    f"   ATE shift per unit λ = {corr_per_lambda:+.6f}",
+]
+for r in tip_rows:
+    lam_ci_s = f"{r['lambda_star_CI']:.4f}" if np.isfinite(r["lambda_star_CI"]) else "n/a"
+    summary_lines.append(
+        f"   {r['Estimator']:<18}: λ*(CI)={lam_ci_s:<8} λ*(point)={r['lambda_star_point']:.4f}")
+summary_lines += [
+    "",
+    "8. PS-matching robustness grid (k × caliper):",
+]
+for r in psm_rows:
+    summary_lines.append(
+        f"   k={r['k']:<2} caliper={r['caliper_SD']:.1f}SD: ATT={r['ATT_1k']:+.4f}  "
+        f"[{r['CI_lo_1k']:+.4f}, {r['CI_hi_1k']:+.4f}]  ({r['pct_matched']:.1f}% matched)")
 summary_lines.append("=" * 70)
 summary_text = "\n".join(summary_lines)
 

@@ -50,9 +50,9 @@ for c in num_cols:
     df[c] = pd.to_numeric(df[c], errors="coerce")
 df["DIED"] = pd.to_numeric(df["DIED"], errors="coerce")
 
-# Treatment groups
-treated = ((df["CIG0_R"] >= 1) & (df["CIG1_R"] >= 1) &
-           (df["CIG2_R"] >= 1) & (df["CIG3_R"] >= 1))
+# Treatment groups (recodes 1-5 are dose categories; 6 = unknown, excluded)
+treated = (df["CIG0_R"].between(1, 5) & df["CIG1_R"].between(1, 5) &
+           df["CIG2_R"].between(1, 5) & df["CIG3_R"].between(1, 5))
 control  = (df["CIG0_R"] == 0) & (df["CIG_REC"] == "N")
 df = df[treated | control].copy()
 df["T"] = treated[df.index].astype(int)

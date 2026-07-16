@@ -1,7 +1,7 @@
 =======================================================
 IPW WEIGHT DIAGNOSTICS
 =======================================================
-Effective sample size (treated): 7,697 / 166,623  (4.6%)
-Effective sample size (control): 2,823,671 / 2,857,495  (98.8%)
-Max stabilised weight:           223.15
+Effective sample size (treated): 2,055 / 147,963  (1.4%)
+Effective sample size (control): 2,819,243 / 2,857,495  (98.7%)
+Max stabilised weight:           492.31
 =======================================================

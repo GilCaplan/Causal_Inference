@@ -1,0 +1,29 @@
+======================================================================
+PROPENSITY MODEL DIAGNOSTICS
+======================================================================
+Analytic sample: 3,005,458  (T=1: 147,963 = 4.92%)
+Train/validation split: 80/20, stratified on T
+
+Chance-level Brier (constant p=0.0492): 0.04681
+Validation Brier — Logistic regression: 0.03909
+Validation Brier — MLP (32,16): 0.03829
+Best model by Brier: MLP (32,16)
+(Main pipeline uses logistic regression; near-identical Brier scores
+ justify the simpler, better-calibrated linear model.)
+
+Placebo test (T permuted before fitting; validation Brier):
+  run 1: 0.04683
+  run 2: 0.04680
+  run 3: 0.04681
+  mean placebo Brier: 0.04681  (≈ chance level 0.04681; real-T Brier 0.03909 is clearly lower → model captures genuine treatment-assignment signal)
+
+Extreme propensity scores by group (risky = inflates IPW weights):
+  treated  e(X) < 0.01      5,323 / 147,963 (3.598%)  ⚠ risky
+  treated  e(X) < 0.05     22,514 / 147,963 (15.216%)  ⚠ risky
+  treated  e(X) > 0.95          0 / 147,963 (0.000%)
+  treated  e(X) > 0.99          0 / 147,963 (0.000%)
+  control  e(X) < 0.01  1,464,396 / 2,857,495 (51.248%)
+  control  e(X) < 0.05  2,239,943 / 2,857,495 (78.388%)
+  control  e(X) > 0.95          0 / 2,857,495 (0.000%)  ⚠ risky
+  control  e(X) > 0.99          0 / 2,857,495 (0.000%)  ⚠ risky
+======================================================================
