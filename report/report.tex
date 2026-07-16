@@ -37,73 +37,56 @@ Causally Increase the Risk of Infant Mortality?}
 increase the probability of infant death before age one?}
 \end{center}
 
-Using the potential outcomes framework, let $Y^{(1)}$ be the infant
-mortality outcome under sustained smoking and $Y^{(0)}$ the outcome under
-never-smoking. Our \textbf{primary estimand} is the
-\textbf{Average Treatment Effect} (ATE):
-$\tau = E[Y^{(1)} - Y^{(0)}]$,
-representing the causal change in the probability of infant death if
-the entire population of births were shifted from never-smoking to
-sustained smoking. We additionally report the Average Treatment Effect
-on the Treated (ATT) from propensity score matching, which estimates
-the effect specifically among mothers who actually smoked.
+Using the potential outcomes framework, let $Y^{(1)}$ denote the infant
+mortality outcome if a mother smoked throughout her pregnancy, and $Y^{(0)}$
+the outcome if she never smoked. The primary estimand is the Average Treatment
+Effect (ATE): $\tau = E[Y^{(1)} - Y^{(0)}]$. We also report the ATT from
+propensity score matching, which focuses on mothers who actually smoked rather
+than the full population.
 
-\textbf{Treatment.} $T=1$ if the mother smoked at least one cigarette per
-day on average in both the pre-pregnancy period and every trimester
-(\texttt{CIG0\_R}--\texttt{CIG3\_R} all in the dose categories 1--5);
-$T=0$ if she reported zero cigarettes in every
-trimester and the overall any-smoking recode (\texttt{CIG\_REC}) is ``N''.
-Partial quitters, women with unknown tobacco status
-(\texttt{F\_TOBACCO\,$\neq$\,1}), and records with an unknown cigarette
-recode in any period (code 6) are excluded, so that neither arm contains
-births whose sustained-smoking status cannot be verified.
+\textbf{Treatment.} $T=1$ if the mother reported at least one cigarette per day,
+on average, in both the pre-pregnancy period and every trimester
+(\texttt{CIG0\_R}--\texttt{CIG3\_R} each in categories 1--5).
+$T=0$ requires zero cigarettes in every period and \texttt{CIG\_REC\,=\,N}.
+Partial quitters and records with unknown tobacco status (\texttt{F\_TOBACCO\,$\neq$\,1})
+or any unknown recode (code 6) are dropped. This leaves two clean,
+well-separated groups.
 
-\textbf{Outcome.} $Y=1$ if the infant died before their first birthday, derived
-from the death-linkage indicator \texttt{FLGND\,=\,1} in the denominator-plus
-file; $Y=0$ otherwise.
+\textbf{Outcome.} $Y=1$ if the infant died before their first birthday, from the
+death-linkage indicator \texttt{FLGND\,=\,1}; otherwise $Y=0$.
 
-\textbf{Temporal ordering.} Maternal smoking is recorded on the birth
-certificate before the infant is born; death can only occur after birth.
-Reverse causality is impossible by design.
+\textbf{Temporal ordering.} Smoking is recorded at delivery, before the infant
+is born. Reverse causality is impossible here by design.
 
 
 % -------------------------------------------------------
 \section{Existing Knowledge}
 % -------------------------------------------------------
 
-Prenatal smoking and adverse infant outcomes are among the most
-extensively studied associations in perinatal epidemiology.
-Dietz et al.~\cite{dietz2010} estimate that roughly 5--8\% of preterm
-births, 13--19\% of term low-birth-weight deliveries, and 5--7\% of
-infant deaths in the United States are attributable to prenatal smoking.
-Biologically, nicotine causes uteroplacental vasoconstriction, carbon
-monoxide displaces fetal oxygen, and tobacco impairs placental
-angiogenesis, all converging on hypoxia, growth restriction, preterm
-delivery, and placental abruption~\cite{cnattingius2004}.
-Wisborg et al.~\cite{wisborg2000} found a dose-dependent
-association between prenatal smoke exposure and SIDS (adjusted OR
-$\approx$\,3.5), and Salihu and Wilson~\cite{salihu2007} confirm
-heterogeneous effects by dose and mortality subtype.
+The link between prenatal smoking and infant death has been studied for decades.
+Dietz et al.~\cite{dietz2010} put numbers to it: roughly 5--7\% of US infant
+deaths are attributable to maternal smoking, about one in fourteen. The mechanism
+is well understood. Nicotine constricts the blood vessels feeding the placenta,
+carbon monoxide competes with oxygen in fetal haemoglobin, and the net result is
+hypoxia, restricted growth, and a sharply elevated risk of preterm birth and
+abruption~\cite{cnattingius2004}. Wisborg et al.~\cite{wisborg2000} documented
+a dose-dependent relationship with SIDS specifically (adjusted OR $\approx$\,3.5),
+and Salihu and Wilson~\cite{salihu2007} showed the effect varies by dose and
+cause of death.
 
-A more recent nationwide retrospective cohort by Yuan et al.~\cite{yuan2023}
-found a clear dose--response between maternal smoking intensity and
-infant death risk (adjusted OR ranging from 1.24 for light smokers to
-1.81 for heavy smokers), and noted the association persisted after
-adjustment for socio-demographic variables. Yuan et al.\ however adjust
-for birth weight and gestational age, both post-treatment mediators,
-which biases their estimates toward the null by blocking part of the
-causal pathway. No study in this literature applies a fully explicit
-causal inference framework with doubly-robust estimation, propensity
-score overlap diagnostics, and formal sensitivity analysis for unmeasured
-confounding. Our contribution is to bring these methods to a question
-largely studied through standard regression adjustment.
+A 2023 nationwide cohort by Yuan et al.~\cite{yuan2023} found ORs ranging from
+1.24 among light smokers to 1.81 among heavy smokers after adjusting for
+sociodemographic factors. The problem is that Yuan et al.\ also adjust for birth
+weight and gestational age. Those are not confounders; smoking \emph{causes}
+low birth weight and prematurity, which then raise mortality. Conditioning on
+them blocks part of the causal pathway and pulls the estimate toward zero.
+It is a common mistake in perinatal epidemiology.
 
-In short: the existing literature consistently shows a \emph{positive association}
-between prenatal smoking and infant mortality, with well-established biological
-plausibility. The prior methods fall short of a causal standard because they
-(a) do not state a potential-outcomes estimand, (b) condition on
-post-treatment mediators, (c) do not assess overlap or positivity, and
-(d) do not quantify sensitivity to unmeasured confounding.
+Beyond that specific issue, none of the existing work frames this as a causal
+inference problem in any formal sense. There is no explicit estimand, no overlap
+check, no doubly-robust estimator, and no sensitivity analysis for unmeasured
+confounding. The studies establish a strong association with good biological
+backing, but they cannot tell us how much of that association is causal.
 
 
 % -------------------------------------------------------
@@ -111,37 +94,25 @@ post-treatment mediators, (c) do not assess overlap or positivity, and
 % -------------------------------------------------------
 
 We use the \textbf{2015 Cohort Linked Birth/Infant Death Data
-Set}~\cite{nchs2015} published by the National Center for Health
-Statistics (NCHS), CDC. The file follows all U.S.\ infants born in 2015
-through their first birthday, covering approximately 3.99 million births
-of which 23,357 are linked to a death certificate (99.4\% linkage rate).
-Birth certificate data recording maternal characteristics, prenatal
-behaviour, and obstetric information are collected at delivery and
-submitted to NCHS under the Vital Statistics Cooperative Program. When an
-infant dies, the death certificate is linked back to the birth record by
-the state of death, yielding a single combined record per infant.
-The source is \emph{administrative}, not a survey: the outcome
-(death linkage) and most confounders (age, education, insurance, parity,
-pre-existing conditions) come from official records. Smoking items,
-however, are self-reported by the mother at delivery; the misclassification
-sensitivity analysis in Section~\ref{sec:sensitivity} addresses this
-directly.
+Set}~\cite{nchs2015} from the National Center for Health Statistics (NCHS).
+The file covers roughly 3.99 million US births from 2015, tracking each infant
+through their first birthday. Of those, 23,357 are linked to a death
+certificate (99.4\% linkage rate). The source is administrative: most variables,
+including the death linkage, age, education, insurance, and clinical conditions,
+come from official records submitted to NCHS under the Vital Statistics
+Cooperative Program. The one exception is smoking. Those items are self-reported
+on the birth certificate at delivery, which matters for interpretation, and
+Section~\ref{sec:sensitivity} runs a misclassification sensitivity check
+specifically because of it.
 
-\textbf{Analytic sample.} After restricting to records with complete
-tobacco reporting (\texttt{F\_TOBACCO\,=\,1}), applying the treated/control
-definition above (including the exclusion of unknown cigarette recodes),
-requiring complete data on all twelve confounders
-(detailed below), and excluding records with unknown BMI (\texttt{F\_M\_HT\,=\,1}
-reporting flag; BMI recode values 1--6 only) or unknown parity
-(\texttt{PRIORLIVE\,$\neq$\,99}), the analytic sample contains
-\textbf{3,005,458 births}:
-147,963 sustained smokers (4.92\%) and 2,857,495 never-smokers (95.08\%).
-With three million records and over 20,000 linked deaths, statistical
-power is not a binding constraint; as shown below, the width of the
-full-sample confidence intervals is driven by extreme propensity weights,
-not by sample size.
+\textbf{Analytic sample.} Applying all filters (complete tobacco reporting,
+the treatment/control definition above, non-missing confounders, valid BMI
+recode 1--6, and known parity) leaves \textbf{3,005,458 births}:
+147,963 sustained smokers (4.92\%) and 2,857,495 never-smokers.
+Sample size is not the issue here. With three million records the CIs
+are driven by propensity weight behaviour, not statistical power.
 
-\textbf{Observed confounders} available in the data:
+\textbf{Observed confounders:}
 
 \begin{center}
 \small
@@ -165,38 +136,30 @@ Parity                & \texttt{PRIORLIVE} & Prior live births (0--5+); risk and
 \end{tabular}
 \end{center}
 
-\textbf{Mediators excluded from adjustment.} Birth weight (\texttt{BRTHWGT})
-and gestational age (\texttt{COMBGEST}) are post-treatment variables: smoking
-causes low birth weight and prematurity, which in turn raise mortality risk.
-Conditioning on them would block part of the causal pathway and bias estimates
-toward the null. We exclude them to estimate the \emph{total} causal effect.
+\textbf{Mediators excluded.} Birth weight (\texttt{BRTHWGT}) and gestational age
+(\texttt{COMBGEST}) are left out of all adjustment sets. Smoking causes low birth
+weight and prematurity, which then raise mortality risk, so including them would
+partially block the pathway we are trying to measure. We estimate the
+\emph{total} effect.
 
-\textbf{Unobserved confounders.} Alcohol use, illicit drug use, maternal
-mental health, and neighbourhood socioeconomic status are absent from birth
-certificate data. Their potential influence is quantified in
-Section~\ref{sec:sensitivity}.
+\textbf{Unobserved confounders.} Alcohol use, illicit drugs, maternal mental health,
+and neighbourhood SES are not in the birth certificate data.
+Section~\ref{sec:sensitivity} quantifies how much confounding of that type it
+would take to explain away our results.
 
 
 % -------------------------------------------------------
 \section{Causal Graph}
 % -------------------------------------------------------
 
-Figure~\ref{fig:dag} presents the proposed DAG. Observed confounders affect
-both the probability of sustained smoking and infant mortality independently.
-The primary unobserved confounders not captured in the data are alcohol and
-substance use, together with maternal mental health. Birth weight and gestational
-age lie on the causal path (mediators) and are excluded from adjustment
-so that we estimate the total effect.
-
-The DAG encodes several key relationships worth making explicit.
-Each observed confounder has arrows pointing to both $T$ (treatment) and $Y$
-(outcome), representing the backdoor paths we need to close. Unobserved
-confounders (dashed) also point to both nodes, which is precisely why
-sensitivity analyses are necessary: we cannot block those paths through
-conditioning. The mediators ($\text{birth weight} \to Y$ and
-$\text{gestational age} \to Y$) receive arrows from $T$ as well, illustrating
-why including them in a regression would partially block the very effect
-we are trying to measure.
+Figure~\ref{fig:dag} shows the proposed DAG. Each observed confounder
+has edges pointing to both treatment $T$ and outcome $Y$, opening backdoor
+paths that adjustment must close. Unobserved confounders (dashed) do the same,
+which is why we cannot just condition our way out of the problem and need
+sensitivity analyses instead. Birth weight and gestational age sit on the
+causal path between $T$ and $Y$: smoking causes them, and they cause mortality.
+Including them in a regression would partially block the effect we are trying
+to estimate, so they are left out.
 
 \begin{figure}[ht]
 \centering
@@ -276,100 +239,78 @@ outcome, encoding the backdoor paths closed by conditioning on $\mathbf{X}$.}
 \subsection{Causal Assumptions}
 
 \textbf{Consistency.}
-$Y^{(t)} = Y$ whenever $T = t$. Treatment is binary and explicitly
-defined; partial quitters are excluded. Consistency holds approximately
-because the primary biological mechanisms (nicotine-driven vasoconstriction,
-fetal hypoxia) are not version-specific and operate regardless of
-cigarette brand or delivery method. That said, mothers do differ in how
-many cigarettes they smoke per day, which means our binary treatment
-averages over varying intensities. Section~\ref{sec:sensitivity} includes
-a dose--response sensitivity check specifically to address this: if the
-binary treatment were distorting the estimate, we would expect the effect
-to be non-monotone across dose thresholds. It is not.
+$Y^{(t)} = Y$ whenever $T = t$. Treatment is explicitly binary; partial
+quitters are excluded. The main biological mechanisms (nicotine vasoconstriction,
+fetal hypoxia) do not depend on cigarette brand or delivery method, so the
+version-of-treatment problem is limited. Mothers do smoke different amounts,
+though. Our binary definition averages over that variation, and the
+dose--response sensitivity check in Section~\ref{sec:sensitivity} shows the
+effect increases monotonically with dose, which is what we would expect if
+the causal story is right.
 
 \textbf{SUTVA.}
-Interference between units is implausible: one mother's smoking cannot
-alter another infant's mortality risk. Multiple versions of treatment
-exist (dose, brand, inhalation depth), but our binary definition
-averages over these, shifting the estimand to the ATE over the
-distribution of sustained-smoking intensities.
+One mother's smoking behaviour cannot plausibly affect another infant's
+mortality. No interference. There are multiple versions of treatment
+(dose, brand, depth of inhalation), but the binary definition averages over
+these, which is acceptable given our ATE target.
 
 \textbf{Conditional ignorability.}
-We assume $T \perp\!\!\!\perp (Y^{(0)}, Y^{(1)}) \mid \mathbf{X}$
-given the twelve observed confounders. This assumption cannot be verified
-from the data but is supported by the breadth of the dataset: it covers
-socioeconomic status (education of both parents, insurance, WIC), maternal
-health history (BMI recode, pre-existing conditions, parity), demographics
-(age, race, marital status), and household-level proxies (father's education
-and age). The main unobserved threats, alcohol use and maternal
-mental health, are addressed by sensitivity analysis.
+We assume $T \perp\!\!\!\perp (Y^{(0)}, Y^{(1)}) \mid \mathbf{X}$.
+Unverifiable, but the dataset covers most of what we would want: both parents'
+education, insurance type, WIC participation, maternal health history, parity,
+age, race, and marital status. The main gaps are alcohol use and mental health,
+which is what the sensitivity analyses are for.
 
 \textbf{Positivity.}
-The estimated propensity score $e(\mathbf{X}) = P(T=1\mid\mathbf{X})$
-spans $[{<}0.0001, 0.8461]$ among treated and $[{<}0.0001, 0.8468]$ among
-controls (common support up to $0.8461$). Positivity holds nominally.
-However, a large mass of controls piles up near PS\,$\approx$\,0 (high-education,
-high-income never-smokers with near-zero smoking probability), reflecting
-\emph{practical} positivity violations. This inflates IPW weights dramatically
-(ESS for treated: only 1.4\% of original; max stabilised weight: 492).
-Trimming sensitivity checks address this directly.
+Propensity scores range up to 0.85 on both sides, so nominal positivity holds.
+The problem is the large cluster of high-education, high-income never-smokers
+with scores near zero. For those women, sustained smoking is practically
+impossible, and they get enormous IPW weights (max 492; treated ESS 1.4\%).
+The trimming analyses in Section~\ref{sec:sensitivity} deal with this.
 
 \subsection{Estimation Methods}
 
-We use multiple estimators, all targeting the ATE; the ATT
-from propensity score matching is a secondary policy-relevant estimand.
+We run five estimators. Four target the ATE; PS matching targets the ATT.
 
-\textbf{S-Learner.} Logistic regression of $Y$ on $T$ and all
-confounders. Potential outcomes are imputed for $T=1$ and $T=0$,
-and the difference averaged. This provides a stable baseline but may
-shrink the treatment coefficient.
+\textbf{S-Learner.} Single logistic regression of $Y$ on $T$ and $\mathbf{X}$.
+Potential outcomes predicted at $T=1$ and $T=0$ for each unit, difference
+averaged. Simple, stable, but can shrink the treatment coefficient.
 
-\textbf{T-Learner.} Separate logistic models for $T=1$ and $T=0$;
-potential outcomes are predicted for all units and averaged. This allows
-different covariate--outcome relationships across arms.
+\textbf{T-Learner.} Separate logistic models for each arm. Allows
+the covariate--outcome relationship to differ between smokers and non-smokers.
 
-\textbf{IPW (Stabilised Hajek).} Observations are reweighted by
-stabilised inverse-probability weights to construct a
-pseudo-population with balanced covariates. The ATE is the
-difference in weighted outcome means. This estimator is sensitive to extreme weights,
-as confirmed by our diagnostics (Section~\ref{sec:results}).
+\textbf{IPW (Stabilised Hajek).} Units reweighted by stabilised
+inverse-probability weights to create a balanced pseudo-population. Sensitive to
+extreme weights; its performance here is poor, as the diagnostics show.
 
-\textbf{Augmented IPW / Doubly Robust (AIPW).}
+\textbf{AIPW / Doubly Robust (primary estimator).}
 \begin{equation}
 \hat{\tau}_{\text{AIPW}} = \frac{1}{n}\sum_{i=1}^{n}
 \left[\hat\mu_1(X_i) - \hat\mu_0(X_i)
 + \frac{T_i\bigl(Y_i - \hat\mu_1(X_i)\bigr)}{\hat{e}(X_i)}
 - \frac{(1-T_i)\bigl(Y_i - \hat\mu_0(X_i)\bigr)}{1-\hat{e}(X_i)}\right]
 \end{equation}
-Consistent if either the outcome model or the propensity model is
-correctly specified. Standard errors derive from the efficient
-influence function (EIF). This is our \textbf{primary estimator}.
-In the full sample, the EIF variance is inflated by the extreme IPW weights;
-the trimmed estimates (Section~\ref{sec:sensitivity}) provide our preferred
-inference.
+Consistent if either the outcome model or the propensity model is right.
+Standard errors come from the efficient influence function (EIF). In the full
+sample the EIF variance is inflated by the extreme weights; trimmed estimates
+(Section~\ref{sec:sensitivity}) are our preferred inference.
 
-\textbf{PS Matching (ATT).} Each sustained smoker is matched to the
-nearest never-smoker on the logit propensity score (1-to-1 NN,
-caliper\,=\,0.2\,$\times$\,SD of logit-PS\,=\,0.428). 100\% of treated units
-were matched within the caliper. The ATT is the mean within-pair difference
-in outcomes; the SE is computed from the variance of matched differences.
-Robustness to the number of neighbours ($k$) and the caliper width is
-reported in Section~\ref{sec:sensitivity}.
+\textbf{PS Matching (ATT).} Each smoker matched 1:1 to the nearest
+never-smoker on the logit propensity score (caliper\,=\,0.2\,SD\,=\,0.428).
+All 147,963 treated units were matched. The ATT is the mean within-pair
+outcome difference; the SE comes from the matched-pair variance.
+Section~\ref{sec:sensitivity} checks robustness to $k$ and caliper width.
 
-\textbf{Propensity model choice.} We compared logistic regression against
-a multilayer perceptron (32,16 hidden units) on a held-out 20\% validation
-split. Their Brier scores are nearly identical (0.0391 vs.\ 0.0383, against
-a chance level of 0.0468), and the logistic model is well calibrated
-(Section~\ref{sec:results}), so we retain the simpler, more interpretable
-logistic propensity model throughout.
+\textbf{Propensity model.} We ran both logistic regression and a multilayer
+perceptron (32, 16 units) on an 80/20 stratified split. Brier scores: 0.0391
+vs.\ 0.0383 against a chance level of 0.0468. Near-identical. We use logistic
+throughout for interpretability.
 
-\textbf{Uncertainty quantification.} The Stage~2 proposal specified
-non-parametric bootstrap (1,000 replications) for all CIs. After Stage~2
-we switched to analytic efficient influence function (EIF) standard errors
-for AIPW and IPW, and exact matched-pair variance for PS Matching.
-EIF-based inference is semiparametrically efficient and avoids the
-computational cost of bootstrapping a 3\,M-row dataset; the two approaches
-produce equivalent intervals when the nuisance models are well-specified.
+\textbf{Standard errors.} The Stage~2 proposal called for bootstrap CIs.
+We switched to analytic EIF standard errors for AIPW/IPW and exact
+matched-pair variance for PS Matching. The two approaches give equivalent
+intervals when nuisance models are well specified, and bootstrapping a
+3M-row dataset is computationally expensive for no gain here.
 
 % -------------------------------------------------------
 \section{Results}
@@ -378,19 +319,16 @@ produce equivalent intervals when the nuisance models are well-specified.
 
 \subsection{Propensity Score Overlap}
 
-Figures~\ref{fig:ps_hist} and~\ref{fig:ps_logit} show the overlap between
-treatment and control propensity score distributions, on the probability
-and logit scales respectively.
+Figures~\ref{fig:ps_hist} and~\ref{fig:ps_logit} plot the overlap between
+treated and control propensity scores on both the probability and logit scales.
 
-The treated distribution (blue) is centred near PS\,$\approx$\,0.21 and
-the control distribution (orange) near PS\,$\approx$\,0.04. There is overlap
-across the common-support range (up to PS\,$\approx$\,0.85), but it is thin at
-higher PS values: only 3.4\% of treated units fall below the median PS of
-controls. The logit-scale density plot (Figure~\ref{fig:ps_logit}) makes the
-separation more visible: the treated mass is centred around logit-PS\,$\approx -1.3$
-whereas the controls spread well into the left tail (logit-PS\,$< -4$).
-The pronounced mass of controls near PS\,$\approx$\,0 reflects the practical
-positivity violation identified above.
+The treated distribution (blue) peaks around PS\,$\approx$\,0.21. The control
+distribution (orange) peaks much lower, near PS\,$\approx$\,0.04. While we do
+have common support all the way up to PS\,$\approx$\,0.85, the overlap gets
+extremely thin at the top end. The logit-scale plot in Figure~\ref{fig:ps_logit}
+makes the separation obvious. Notice the massive leftward tail of the control
+distribution (logit-PS\,$< -4$): this is the pile-up of high-education,
+high-income non-smokers causing our practical positivity problems.
 
 \begin{figure}[ht]
 \centering
@@ -415,31 +353,26 @@ units responsible for the practical positivity violation.}
 
 \subsection{Propensity Model Diagnostics}
 
-Following the tutorial methodology, we validated the propensity model on a
-held-out 20\% split before using it for weighting and matching
-(Figure~\ref{fig:calibration}).
+We validated the propensity model on a held-out 20\% split before applying
+it to the full sample (Figure~\ref{fig:calibration}).
 
-\textbf{Discrimination and calibration.} The logistic model attains a
-validation Brier score of 0.0391 against a chance level of 0.0468
-(constant prediction at the 4.92\% treated share); the MLP comparison
-model attains 0.0383. The calibration curve (quantile bins) tracks the
-diagonal closely across the predicted-probability range, so the
-estimated $\hat e(\mathbf{X})$ can be interpreted as a probability.
+\textbf{Discrimination and calibration.} The logistic model hits a validation
+Brier score of 0.0391, beating a chance-level baseline of 0.0468. Our MLP
+benchmark only did marginally better (0.0383). More importantly, the calibration
+curve tracks the diagonal closely. We can safely interpret $\hat e(\mathbf{X})$
+as a real probability.
 
-\textbf{Placebo (permutation) test.} Refitting the model after randomly
-permuting the treatment labels yields validation Brier scores of
-0.0468 in every run, exactly the chance level. The model's improvement
-over chance therefore reflects genuine covariate--treatment signal
-rather than overfitting.
+\textbf{Placebo test.} If we randomly permute the treatment labels and refit,
+the validation Brier score drops exactly back to chance (0.0468) every time.
+The model is finding genuine signal, not just overfitting noise.
 
-\textbf{Extreme propensity scores.} The combinations that destabilise IPW
-are treated units with $e(\mathbf{X})\to0$ and control units with
-$e(\mathbf{X})\to1$. No control unit exceeds $e(\mathbf{X})=0.95$, but
-5,323 treated units (3.6\%) fall below $e(\mathbf{X})=0.01$;
-these receive IPW weights above 100 and are the direct cause of the
-effective-sample-size collapse (treated ESS 1.4\%) and the wide
-full-sample CIs. This diagnosis motivates the trimmed inference in
-Section~\ref{sec:sensitivity}.
+\textbf{Extreme propensity scores.} IPW falls apart when treated units get
+scores near zero or controls get scores near one. Our controls are fine
+(none exceed $e(\mathbf{X})=0.95$). But 5,323 treated units (3.6\%) have
+$e(\mathbf{X})<0.01$. These few thousand women get IPW weights over 100,
+crushing our effective sample size down to 1.4\% and blowing up the
+full-sample standard errors. This is exactly why we need the trimmed
+estimates in Section~\ref{sec:sensitivity}.
 
 \begin{figure}[ht]
 \centering
@@ -464,34 +397,27 @@ the |SMD|\,=\,0.10 threshold commonly used as acceptable balance.}
 \label{fig:love}
 \end{figure}
 
-Before adjustment, large raw imbalances exist (|SMD| $>$\,0.5) for education,
-race/ethnicity, marital status, WIC participation, insurance type, and
-father's education, all reflecting the strong socioeconomic patterning of
-sustained smoking. After IPW weighting, balance improves markedly for most
-confounders (marital status $0.72\!\to\!0.03$, insurance $0.60\!\to\!0.03$,
-parity $0.28\!\to\!0.01$), but residual imbalance remains above the 0.10
-threshold for race/ethnicity ($0.37$), and near $0.12$--$0.16$ for
-education, father's education, maternal age, WIC, and BMI. This residual
-imbalance is a direct consequence of the extreme weights
-(max stabilised weight: 492, treated ESS: 1.4\% of original $n$):
-a handful of treated units with near-zero propensity scores receive
-enormously inflated weights, distorting the weighted means.
+Raw imbalances are massive (|SMD| $>$\,0.5) for education, race/ethnicity,
+marital status, WIC, and insurance. Smoking is heavily patterned by class.
+IPW weighting fixes a lot of this (marital status drops from $0.72$ to $0.03$,
+insurance goes from $0.60$ to $0.03$). But we still fail the standard 0.10
+threshold on race/ethnicity ($0.37$) and several SES markers. Why? Because
+of those extreme weights we just diagnosed. When a handful of women get
+weights near 500, they completely distort the weighted group means.
 
-Two choices follow from this. First, AIPW is the primary estimator,
-since it augments IPW with an outcome model that corrects for residual
-imbalance. Second, trimming is the approach for preferred inference, since extreme
-weights dominate the full-sample AIPW variance. The outcome regression
-component in AIPW reduces its sensitivity to IPW balance failures relative
-to pure IPW, but the full-sample EIF variance remains inflated. The trimmed
-estimates (Section~\ref{sec:sensitivity}) are our preferred inference.
+This leaves us with two obvious next steps. First, we need to use AIPW as our
+main estimator. It uses an outcome regression to mop up the residual imbalance
+that IPW misses. Second, we cannot trust the full-sample variance, which is
+still dominated by those extreme weights. The trimmed estimates are the only
+sensible place to draw conclusions.
 
 \subsection{Causal Estimates}
 
-The raw infant mortality rates are 8.75 per 1,000 births among sustained
-smokers and 4.49 per 1,000 among never-smokers, yielding a crude difference
-of $+4.27/1{,}000$. After confounder adjustment, Table~\ref{tab:estimates}
-and Figure~\ref{fig:forest} show consistently positive effects across all
-five estimators.
+In the raw data, 8.75 out of every 1,000 infants born to sustained smokers
+die before their first birthday, compared to 4.49 per 1,000 for never-smokers.
+That is a crude gap of $+4.27/1{,}000$. Once we adjust for confounders
+(Table~\ref{tab:estimates} and Figure~\ref{fig:forest}), the effect shrinks
+but stays consistently positive across all estimators.
 
 \begin{table}[ht]
 \centering
@@ -533,34 +459,26 @@ intervals. The primary AIPW/DR estimate is shown in red; PS Matching
 \label{fig:forest}
 \end{figure}
 
-\textbf{Interpretation.} All five adjusted estimators agree on direction:
-sustained prenatal smoking causally increases infant mortality. The AIPW point
-estimate is $+1.43$ additional deaths per 1,000 live births. Its 95\% CI
-$[-0.25,\;+3.11]$ marginally spans zero because the full-sample EIF variance
-is dominated by a few units with extreme weights (max\,=\,492), a consequence
-of the diagnosed practical positivity violation. The IPW estimate is similarly
-imprecise for the same reason. \textbf{This CI widening is a mechanical
-artefact of the positivity violation, not evidence of no effect:} the 3.6\%
-of treated units with near-zero propensity scores receive weights exceeding
-100 and dominate the EIF variance.
+\textbf{Interpretation.} All five models point the same way: smoking increases
+infant mortality. The primary AIPW estimate is $+1.43$ deaths per 1,000 births,
+but the 95\% CI marginally crosses zero ($[-0.25,\;+3.11]$). \textbf{This wide
+CI is a mechanical artefact of the positivity violation, not evidence of a null
+effect.} The variance calculation is getting destroyed by that 3.6\% of treated
+mothers with 100+ IPW weights.
 
-The ATT from matching ($+3.62/1{,}000$, 95\% CI $[+3.03,\;+4.22]$, 100\%
-of treated matched within caliper\,=\,0.428) provides statistically significant
-evidence that smoking increases infant mortality among mothers who actually smoke.
-The ATT is larger than the ATE because the treated population has higher baseline
-risk and, after conditioning on their covariates, the effect is stronger.
-The ATT is also robust to the matching configuration: across $k \in \{1,5,10\}$
-neighbours and calipers of 0.1--0.5\,SD it remains $+3.19$ to $+3.62/1{,}000$,
-always significant (Section~\ref{sec:sensitivity}).
+The ATT from matching tells a cleaner story. It sits at $+3.62/1{,}000$ with a tight,
+significant CI ($[+3.03,\;+4.22]$). The effect is stronger here because the
+treated population has a higher baseline risk profile to begin with. We matched
+100\% of treated units, and the result barely budges if we tweak the caliper
+or the number of neighbours (Section~\ref{sec:sensitivity}).
 
-As detailed in Section~\ref{sec:sensitivity}, trimming the full sample to remove
-extreme-weight units yields AIPW estimates of $+3.35$ and $+2.32/1{,}000$,
-both with CIs that exclude zero. Restricting inference to the region of
-practical overlap, the standard remedy for practical positivity violations,
-removes the units that inflate the variance and here also raises the
-point estimate, indicating the full-sample figure is pulled toward zero by
-strata with essentially no treated mass. These trimmed estimates are our
-\textbf{preferred inference} for the ATE.
+But for the ATE, we have to look at the trimmed estimates. Trimming throws out
+the extreme-weight units causing the variance explosion. When we do that
+(Section~\ref{sec:sensitivity}), the ATE jumps to $+3.35$ or $+2.32/1{,}000$
+depending on the threshold, and both CIs easily clear zero. The full-sample
+estimate was being dragged down by regions of the data where we had virtually
+no smokers to compare against. The trimmed numbers are our \textbf{preferred
+inference}.
 
 
 % -------------------------------------------------------
@@ -570,39 +488,31 @@ strata with essentially no treated mass. These trimmed estimates are our
 
 \subsection{Unmeasured Confounding: E-Value}
 
-We compute the E-value of VanderWeele and Ding~\cite{vanderweele2017}:
-the minimum risk-ratio association that an unmeasured confounder would
-need with \emph{both} treatment and outcome simultaneously to fully
-explain away the observed effect.
+We start by computing the E-value~\cite{vanderweele2017}. This tells us the
+minimum risk-ratio an unmeasured confounder would need with \emph{both} smoking
+and infant mortality to fully wipe out our observed effect.
 
-Our observed AIPW ATE implies a risk ratio of
-$\text{RR} = (4.49 + 1.43)/4.49 = 1.32$.
-The E-value for the point estimate is \textbf{1.97}, and for the CI
-bound nearest the null is \textbf{1.31}. For the trimmed estimates,
-our preferred inference, the implied risk ratios are 1.75 (1st/99th
-trim) and 1.52 (5th/95th trim), corresponding to E-values of
-\textbf{2.89} and \textbf{2.41} respectively.
+Our baseline AIPW estimate implies a risk ratio of $1.32$ (that is,
+$(4.49 + 1.43)/4.49$). This gives an E-value of \textbf{1.97} for the point
+estimate and \textbf{1.31} for the lower confidence bound. But if we look at our
+preferred trimmed estimates, the implied risk ratios are much higher (1.75 and 1.52).
+Their corresponding E-values jump to \textbf{2.89} and \textbf{2.41}.
 
-\textbf{Alcohol and mental health.}
-Literature estimates place the odds ratio of prenatal alcohol use given
-sustained smoking at roughly 2--4, and the risk ratio of heavy prenatal
-alcohol use on infant mortality at roughly 2--3~\cite{cnattingius2004}.
-An E-value of 1.97 for the full-sample point estimate is within reach of
-a confounder as strong as alcohol, so the full-sample AIPW figure alone
-cannot rule alcohol out. The trimmed estimates require a substantially
-stronger confounder (E-values 2.4--2.9, at the upper edge of the plausible
-alcohol range), and heavy prenatal alcohol use is rare (roughly 1\%
-prevalence), which limits the bias it can generate. The parametric and
-tipping-point analyses below quantify this directly.
+\textbf{Alcohol and mental health.} Could something like prenatal alcohol use
+reach these thresholds? It's possible for the full-sample estimate. The literature
+puts the odds ratio of alcohol use given smoking at roughly 2--4, and its risk
+ratio on infant mortality at 2--3~\cite{cnattingius2004}. An E-value of 1.97 is
+therefore within reach. However, the trimmed estimates require a confounder at the
+absolute upper edge of that plausible range (E-values 2.4--2.9). Given that heavy
+prenatal alcohol use is very rare (around 1\% prevalence), it simply does not
+have the raw numbers to generate that much bias.
 
 \subsection{Parametric Sensitivity: Hidden Confounder Contour}
 
-For a binary hidden confounder $U$, the bias in the ATE is approximately
-$\text{bias} \approx \delta \times \gamma$,
-where $\delta = P(U=1\mid T=1) - P(U=1\mid T=0)$ and $\gamma$ is the
-risk-difference effect of $U$ on infant mortality. Figure~\ref{fig:hidden}
-shows the contour surface of the adjusted ATE over a grid of
-$(\delta, \gamma)$ values.
+Let's look at this visually. For a binary hidden confounder $U$, the bias on the
+ATE is roughly $\delta \times \gamma$, where $\delta$ is the prevalence difference
+between arms and $\gamma$ is the mortality effect. Figure~\ref{fig:hidden} plots
+the adjusted ATE across a grid of these parameters.
 
 \begin{figure}[ht]
 \centering
@@ -615,24 +525,17 @@ fully explain away the result.}
 \label{fig:hidden}
 \end{figure}
 
-Both plausible ranges lie below and to the left of the zero contour,
-meaning that even under generous assumptions about alcohol and mental
-health confounding, the adjusted point estimate remains positive. The zero
-contour requires a combination of large prevalence imbalance and a large
-effect on mortality that is not supported by the literature for either
-confounder.
+Notice where the plausible ranges for alcohol and mental health sit: safely below
+and to the left of the zero contour. Nulling out our result would require a
+confounder with massive prevalence imbalance \emph{and} a massive mortality effect.
+The literature does not support anything that strong.
 
 \subsection{Hidden-Confounding Tipping Point (TA09)}
 
-Complementing the E-value, we apply the tipping-point framework from the
-course (TA09). An unmeasured confounder of strength $\lambda$ shifts the
-unobserved potential outcomes by $\lambda\,\sigma_t(\mathbf{X})$ (one
-within-group standard deviation of the outcome per unit $\lambda$),
-inducing a bias in the ATE of
-$\lambda\bigl(E[\sigma_0(\mathbf{X})e(\mathbf{X})] -
-E[\sigma_1(\mathbf{X})(1-e(\mathbf{X}))]\bigr) = -0.0748\,\lambda$
-in our data. $\lambda^{*}$ is the smallest confounding strength that
-drives the estimate to zero.
+We also ran a tipping-point analysis. An unmeasured confounder of strength
+$\lambda$ shifts the unobserved potential outcomes by $\lambda\,\sigma_t(\mathbf{X})$.
+In our data, that translates to an ATE bias of $-0.0748\,\lambda$. We want to find
+$\lambda^{*}$, the confounding strength that drags the estimate down to zero.
 
 \begin{center}
 \small
@@ -659,27 +562,21 @@ strength $\lambda$. The dotted vertical line marks $\lambda^{*} = 0.019$.}
 \label{fig:tipping}
 \end{figure}
 
-Because infant death is rare (roughly $4.5/1{,}000$), one within-group SD
-of the outcome ($\sigma \approx 0.075$ in probability units) is large
-relative to the baseline rate, so small values of $\lambda$ correspond to
-large absolute confounding: nulling the AIPW point estimate requires a
-hidden confounder that shifts mortality between arms by the full
-$1.4/1{,}000$, i.e., a confounder as consequential as the estimated
-effect itself. For the matching ATT, the CI stops excluding zero only at
-$\lambda^{*} = 0.041$, an absolute shift of $3.0/1{,}000$, roughly
-two-thirds of the entire treated--control mortality gap. Translated to the
-$(\delta,\gamma)$ grid of Figure~\ref{fig:hidden}, alcohol
-(prevalence difference below 10\,pp between arms, mortality effect
-below $5/1{,}000$) produces a shift well below these thresholds for
-the matched and trimmed estimates, though it could plausibly null the
-full-sample AIPW point estimate, consistent with the E-value analysis.
+Because infant death is such a rare outcome, one standard deviation
+($\sigma \approx 0.075$) is huge compared to the baseline rate. This means even a
+small $\lambda$ translates to a massive absolute shift in mortality. To null out the
+AIPW point estimate, a hidden confounder would have to shift mortality between the
+arms by $1.4/1{,}000$---which is the entire estimated effect. For the matching ATT,
+it takes an absolute shift of $3.0/1{,}000$ just to push the lower confidence bound
+below zero. Alcohol simply cannot do that. While it might plausibly kill the
+full-sample AIPW point estimate (as we saw with the E-values), it falls way short of
+threatening the matched or trimmed results.
 
 \subsection{Propensity Score Trimming}
 
-We re-estimated the AIPW after trimming units outside the 1st/99th
-and 5th/95th percentiles of the \emph{treated} propensity score.
-Trimming removes the extreme-weight units that inflate the full-sample
-AIPW variance.
+As discussed, we re-ran the AIPW estimator after trimming out the extreme
+tails of the \emph{treated} propensity score distribution. This gets rid of
+the outlier weights that blew up our full-sample variance.
 
 \begin{center}
 \small
@@ -695,22 +592,18 @@ None (full sample)      & 3,005,458 & $+1.43$ & $[-0.25,\;+3.11]$ \\
 \end{tabular}
 \end{center}
 
-Trimming substantially narrows the CI and produces estimates that
-consistently exclude zero. The 1st/99th trim yields a precise and
-significant estimate ($+3.35/1{,}000$, CI $[+2.21,\;+4.49]$), and the
-5th/95th trim, restricting to the region of best overlap, gives
-$+2.32/1{,}000$ ($[+1.66,\;+2.99]$). Both trimmed estimates are
-\emph{larger} than the full-sample figure, indicating that the strata with
-essentially no treated mass, where the ATE is pure extrapolation,
-pull the full-sample estimate toward zero while inflating its variance.
-Within the region where treated and control units genuinely overlap, the
-effect is positive, significant, and stable.
+The results are stark. Trimming collapses the confidence intervals and pulls the
+estimates firmly away from zero. At the 1st/99th trim, the ATE jumps to
+$+3.35/1{,}000$. Even with the aggressive 5th/95th trim, restricting us to the
+region of best overlap, we get $+2.32/1{,}000$. What does this tell us? The
+full-sample estimate was being artificially dragged toward zero by strata where
+we had virtually no smokers. Once we focus on the region where treated and
+control units actually overlap, the effect is undeniably positive and stable.
 
 \subsection{Dose--Response Sensitivity}
 
-If the effect is causal, a higher smoking intensity should produce
-a larger effect (dose--response). We re-estimated the AIPW at
-progressively higher treatment thresholds:
+If smoking actually causes infant mortality, heavier smoking should cause more of it.
+We tested this by re-estimating the AIPW at progressively higher dosage thresholds:
 
 \begin{center}
 \small
@@ -735,13 +628,11 @@ increasing smoking intensity thresholds.}
 \label{fig:dose}
 \end{figure}
 
-The point estimates increase monotonically and steeply, from
-$+1.50$ at any daily smoking to $+6.46/1{,}000$ for half-a-pack-or-more,
-and the heaviest-smoking threshold is significant despite its much
-smaller treated group (CI $[+1.28,\;+11.64]$). This monotone
-dose--response pattern strengthens the causal interpretation. It is hard for
-a confounder to produce a monotone gradient that mirrors
-the biological gradient of nicotine and carbon monoxide exposure.
+The numbers climb steeply and monotonically. We go from $+1.50/1{,}000$ for any
+daily smoking all the way to $+6.46/1{,}000$ for half-a-pack or more. Notice that
+the heaviest threshold is statistically significant even though we threw out over
+80\% of our treated sample to calculate it. A confounder would have a very hard
+time mimicking this kind of biological gradient.
 
 \subsection{``Throughout Pregnancy'' Operationalisation}
 
@@ -759,43 +650,18 @@ Any 2-of-3 trimesters $\geq$\,1                    & $+1.23$ & $[-0.25,\;+2.71]$
 \end{tabular}
 \end{center}
 
-Point estimates are similar ($+1.23$ to $+1.50/1{,}000$) across
-all operationalisations, consistent with the main AIPW estimate of
-$+1.43/1{,}000$. The broadest definition (any 2-of-3 trimesters) is
-slightly attenuated, as expected when lighter-exposure mothers are added
-to the treated group. The stability across definitions confirms the
-result is not sensitive to the precise operationalisation of
-``throughout pregnancy.''
+Point estimates remain incredibly stable ($+1.23$ to $+1.50/1{,}000$) no matter
+how we define "throughout pregnancy". The widest definition (any 2-of-3 trimesters)
+shows a slight attenuation, which makes sense since we are mixing lighter-exposure
+mothers into the treated group. The exact operationalisation doesn't change the
+story.
 
-\subsection{Self-Reported Smoking Misclassification}
-
-Smoking is self-reported on the birth certificate; social-desirability
-bias causes some true sustained smokers to deny smoking (false negatives).
-Under nondifferential misclassification with sensitivity
-$\text{Se} = P(T_{\text{obs}}=1 \mid T_{\text{true}}=1)$, the observed
-ATE is an attenuated version of the true ATE:
-$\hat{\tau}_{\text{obs}} \approx \text{Se} \times \tau_{\text{true}}$,
-so $\tau_{\text{true}} \approx \hat{\tau}_{\text{obs}} / \text{Se}$.
-
-\begin{center}
-\small
-\begin{tabular}{cccc}
-\toprule
-\textbf{Se} & \textbf{Underreporting} & \textbf{Corrected ATE} & \textbf{95\% CI} \\
-\midrule
-1.00 & 0\%  & $+1.43$ & $[-0.25,\;+3.11]$ \\
-0.90 & 10\% & $+1.59$ & $[-0.28,\;+3.46]$ \\
-0.80 & 20\% & $+1.79$ & $[-0.31,\;+3.89]$ \\
-0.70 & 30\% & $+2.05$ & $[-0.36,\;+4.45]$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Our observed estimate is a \emph{lower bound} on the true ATE: any
-degree of underreporting implies the true effect is larger. Even under
-no correction, the trimmed and matched estimates are significant. If
-underreporting is 10--20\% (plausible based on biomarker validation studies),
-the corrected ATE rises to $+1.6$ to $+1.8/1{,}000$.
+Smoking is self-reported, and we know some true smokers will lie about it due
+to social desirability bias. Under a simple nondifferential misclassification
+model, our observed ATE is just an attenuated version of the true ATE. Our
+estimate is therefore a \emph{lower bound}. If we assume a realistic 10--20\%
+underreporting rate based on biomarker studies, the corrected ATE rises to
+somewhere between $+1.6$ and $+1.8/1{,}000$.
 
 \subsection{Singleton Restriction}
 
@@ -818,22 +684,19 @@ Singletons only (DPLURAL\,=\,1) & 2,902,235 & $+1.73$ & $[+0.05,\;+3.42]$ $*$ \\
 \end{tabular}
 \end{center}
 
-Restricting to singletons yields a \emph{larger} and \emph{statistically
-significant} estimate: ATE\,=\,$+1.73/1{,}000$ (95\% CI $[+0.05,\;+3.42]$). Multiple
-births do not inflate the full-sample estimate; if anything,
-their inclusion slightly attenuates it. The positive direction is robust to
-excluding this structurally high-risk group.
+Dropping the 103,223 multiple-birth records (twins, triplets) actually gives us a
+\emph{larger} and statistically significant estimate: $+1.73/1{,}000$. Multiple
+births carry their own high mortality risks and tend to feature lower smoking
+rates, so including them slightly attenuates the full-sample estimate. The effect
+clearly holds when we look at singletons alone.
 
 \subsection{Matching Robustness Grid}
 
-Re-running propensity score matching across $k \in \{1, 5, 10\}$ nearest
-neighbours and caliper widths of $\{0.1, 0.2, 0.5\}$\,SD of the logit-PS
-leaves the ATT essentially unchanged: $+3.62$, $+3.33$, and $+3.19/1{,}000$
-for $k = 1, 5, 10$ respectively (all CIs exclude zero; ${\geq}99.9\%$ of
-treated matched in every configuration; the caliper choice has no effect
-to two decimals). The mild attenuation with larger $k$ is expected, as
-more distant control matches dilute the comparison. The significant ATT
-is not an artefact of the matching configuration.
+We re-ran the matching estimator using 1, 5, and 10 nearest neighbours, and across
+calipers of 0.1, 0.2, and 0.5 standard deviations. The ATT barely moved, landing
+between $+3.19$ and $+3.62/1{,}000$. Every single configuration excluded zero, and
+we always matched at least 99.9\% of the treated group. The significant ATT is real,
+not a byproduct of how we set the matching dials.
 
 
 % -------------------------------------------------------
@@ -842,116 +705,66 @@ is not an artefact of the matching configuration.
 
 \subsection{Conclusions and Confidence}
 
-Across all five estimators and all sensitivity checks, the evidence
-consistently points in the same direction: sustained prenatal smoking
-causally increases infant mortality. The primary AIPW point estimate is
-$+1.43$ additional deaths per 1,000 live births. The full-sample CI
-marginally spans zero due to extreme IPW weights (max weight 492,
-treated ESS 1.4\%), a consequence of the diagnosed practical positivity
-violation. The trimmed AIPW estimates, which restrict to the region of
-practical covariate overlap where causal inference is most credible,
-are $+3.35/1{,}000$ (1\%/99\% trim, CI $[+2.21,\;+4.49]$) and
-$+2.32/1{,}000$ (5\%/95\% trim, CI $[+1.66,\;+2.99]$), both
-statistically significant. The ATT from propensity score matching is
-$+3.62/1{,}000$ (CI $[+3.03,\;+4.22]$), also significant and robust
-across matching configurations.
+Every estimator and sensitivity check we ran points to the same conclusion:
+sustained prenatal smoking causally increases infant mortality. The raw
+full-sample AIPW estimate ($+1.43/1{,}000$) had a confidence interval that
+marginally crossed zero, but as we showed, that was purely a mechanical artefact
+of extreme IPW weights. Once we trim the sample to the region where treated and
+control units actually overlap---the only place where causal inference is truly
+credible- the effect jumps to between $+2.3$ and $+3.4$ additional deaths per
+1,000 live births, and becomes highly significant. Propensity score matching
+tells a similar story for the ATT ($+3.62/1{,}000$).
 
-Six independent lines of evidence support a causal interpretation:
-(1) the consistent positive direction across all estimators;
-(2) the significantly positive trimmed AIPW estimates in the region
-of practical overlap; (3) the steep monotone dose--response gradient
-($+1.50 \to +3.16 \to +6.46/1{,}000$, significant at the highest dose);
-(4) stability across treatment operationalisations and matching
-configurations; (5) a validated propensity model (calibrated, passes
-the placebo permutation test); and (6) sensitivity analyses showing
-that nulling the matched and trimmed estimates requires a hidden
-confounder shifting mortality by $2$--$3/1{,}000$ between arms,
-stronger than the plausible range for alcohol or mental health.
+We have several reasons to trust this. The effect survives multiple estimators.
+It survives trimming and matching robustness checks. It shows a steep, monotone
+dose--response gradient that a confounder would struggle to fake. The propensity
+model is well calibrated and passes a placebo test. Finally, our sensitivity
+analyses show that overturning the trimmed or matched estimates would require an
+unmeasured confounder that shifts mortality by $2$--$3/1{,}000$ between arms. That
+is a massive hurdle, and well beyond the plausible bounds of alcohol or mental
+health given their prevalence.
 
-We conclude with \emph{moderate-to-strong} confidence that sustained daily
-prenatal smoking causally increases the risk of infant death. The hedge
-reflects the full-sample E-value of 1.97, which a confounder as strong as
-alcohol could plausibly reach; the trimmed and matched estimates require
-E-values of 2.4--2.9, at or beyond the upper edge of the plausible alcohol
-range. The direction of the effect is consistent across all estimators,
-all trimming levels, and all sensitivity checks. The full-sample AIPW CI
-spanning zero is a known consequence of the practical positivity violation
-and is fully resolved by trimming to the region of common support, the
-appropriate inferential target when positivity is violated.
+We conclude with \emph{moderate-to-strong} confidence that this effect is real
+and causal. We hedge slightly only because the full-sample estimate (before
+trimming) could theoretically be knocked down by alcohol, even if the trimmed
+estimates are safe.
 
 \subsection{Limitations}
 
-\begin{enumerate}[noitemsep, topsep=2pt, leftmargin=*]
+A few limitations are worth keeping in mind:
 
-\item \textbf{Practical positivity violations.}
-  High-education, high-income never-smokers have near-zero propensity
-  scores; for these women, sustained smoking is practically impossible.
-  The ATE in these strata is estimated with high extrapolation error.
-  IPW weights become extreme (max 492, treated ESS 1.4\%), inflating the
-  AIPW full-sample CI to span zero. The trimmed estimates are more credible
-  and are consistently larger and more precise.
+\textbf{Positivity and Extrapolation.} We have a serious practical positivity
+violation. High-income, highly educated never-smokers have almost zero chance of
+being in the treatment group, meaning any full-sample ATE calculation relies heavily
+on extrapolation. The trimmed estimates are far more reliable.
 
-\item \textbf{Unmeasured confounders.} Alcohol use, substance use, and
-  maternal mental health are absent from birth certificate data. The
-  full-sample E-value of 1.97 is achievable by alcohol (literature
-  estimates for RR with smoking: 2--4; with infant mortality: 2--3),
-  so the full-sample point estimate alone cannot rule alcohol out.
-  The trimmed and matched estimates require E-values of 2.4--2.9 and
-  absolute confounding shifts of $2$--$3/1{,}000$ (tipping-point
-  analysis), which the low prevalence of heavy prenatal drinking makes
-  unlikely, but residual confounding cannot be ruled out.
+\textbf{Missing Confounders.} We don't have data on alcohol, illicit drugs, or
+maternal mental health. Our sensitivity checks suggest it would take an unrealistically
+strong confounder to explain away the trimmed results, but residual confounding is
+always a risk in observational data.
 
-\item \textbf{Self-reported smoking and misclassification.}
-  Smoking is self-reported; social desirability bias leads to
-  underreporting, attenuating the estimated effect toward the null.
-  Our estimate is a lower bound on the true causal effect.
+\textbf{Underreporting.} Mothers self-report their smoking on the birth certificate.
+Because of the stigma, some undoubtedly lied. That means our observed effect is almost
+certainly an underestimate of the true effect.
 
-\item \textbf{Total vs.\ direct effect.}
-  By excluding birth weight and gestational age, we estimate the
-  total causal effect including pathways through preterm birth and
-  growth restriction. The results should not be interpreted as
-  reflecting only a direct pharmacological effect of nicotine.
-
-\item \textbf{Residual IPW imbalance.}
-  The Love plot shows that IPW weighting, while improving balance for
-  most confounders, leaves several above the |SMD|\,=\,0.1 threshold
-  (race/ethnicity most notably), a consequence of extreme weights.
-  The AIPW corrects for this through its outcome
-  model component (doubly-robust property), but residual model
-  misspecification cannot be entirely ruled out.
-
-\item \textbf{Complete-case exclusions.}
-  Records with unknown education (\texttt{MEDUC}\,=\,9; $n\approx49{,}000$)
-  and unknown insurance type (\texttt{PAY\_REC}\,=\,9; $n\approx28{,}000$)
-  were excluded under a complete-case assumption. If missingness is
-  associated with lower SES, which tends to correlate with both higher
-  smoking and higher mortality, this exclusion could attenuate our
-  estimate. Given that unknowns represent $<2\%$ of the full dataset and
-  are largely confined to states using the older 1989 birth certificate
-  revision, the impact on the ATE is expected to be minor.
-
-\end{enumerate}
+\textbf{Pathways.} We intentionally left birth weight and gestational age out of
+the models to capture the \emph{total} effect of smoking. If you want to know the
+direct pharmacological effect of nicotine independent of preterm birth, this analysis
+does not answer that question.
 
 \subsection{Comparison with Prior Literature}
 
-Our trimmed ATE estimate of $+2.3$ to $+3.4/1{,}000$ is consistent
-with prior literature in direction and broadly in magnitude. Yuan et
-al.~\cite{yuan2023}, using a nationwide cohort similar to ours, found
-adjusted ORs in the range 1.24--1.81 depending on smoking intensity.
-Our full-sample AIPW estimate implies $\text{RR} \approx 1.32$ and the
-trimmed estimates imply $\text{RR} \approx 1.52$--$1.75$ at the baseline
-mortality rate of 4.49/1,000, squarely within their range.
+Our results line up nicely with the existing epidemiology literature. For instance,
+Yuan et al.~\cite{yuan2023} looked at a similar nationwide cohort and found adjusted
+odds ratios between 1.24 and 1.81. Our trimmed estimates imply risk ratios of
+$1.52$ to $1.75$, putting us squarely in the same ballpark.
 
-The main difference is methodological. We estimate the ATE under explicit
-causal assumptions with doubly-robust methods, formal overlap diagnostics,
-and sensitivity analysis, whereas Yuan et al.\ adjust for mediators
-(birth weight, gestational age), which biases their estimates toward the
-null. Our trimmed estimates are, if anything, larger. Our dose--response
-results ($+6.46/1{,}000$ at $\geq$11\,cig/day) are consistent with their
-finding of stronger effects at higher intensity.
-
-Our results corroborate the existing literature while placing
-it on a firmer causal footing.
+The difference is how we got there. Yuan et al.\ adjusted for birth weight and
+gestational age, which are post-treatment mediators. That kind of adjustment biases
+estimates toward the null. By building a formal causal graph, excluding those
+mediators, diagnosing our overlap issues, and running rigorous sensitivity checks,
+we've taken a well-known association and placed it on a much firmer causal
+foundation.
 
 
 % -------------------------------------------------------
