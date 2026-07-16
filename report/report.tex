@@ -239,20 +239,19 @@ outcome, encoding the backdoor paths closed by conditioning on $\mathbf{X}$.}
 \subsection{Causal Assumptions}
 
 \textbf{Consistency.}
-$Y^{(t)} = Y$ whenever $T = t$. Treatment is explicitly binary; partial
+$Y^{(t)} = Y$ whenever $T = t$. Our treatment is binary, where partial
 quitters are excluded. The main biological mechanisms (nicotine vasoconstriction,
-fetal hypoxia) do not depend on cigarette brand or delivery method, so the
-version-of-treatment problem is limited. Mothers do smoke different amounts,
-though. Our binary definition averages over that variation, and the
-dose--response sensitivity check in Section~\ref{sec:sensitivity} shows the
+fetal hypoxia) do not depend on cigarette brand or delivery method, therefore, the
+version-of-treatment problem is limited. We would like to note that mothers do smoke different amounts. Our binary definition averages over that variation, and the
+dose-response sensitivity check in Section~\ref{sec:sensitivity} shows the
 effect increases monotonically with dose, which is what we would expect if
 the causal story is right.
 
 \textbf{SUTVA.}
 One mother's smoking behaviour cannot plausibly affect another infant's
-mortality. No interference. There are multiple versions of treatment
-(dose, brand, depth of inhalation), but the binary definition averages over
-these, which is acceptable given our ATE target.
+mortality. We could argue that second-hand smoke exposure from other
+parents might constitute a form of interference, but we consider this
+effect to be very unlikely or at least negligible in this context.
 
 \textbf{Conditional ignorability.}
 We assume $T \perp\!\!\!\perp (Y^{(0)}, Y^{(1)}) \mid \mathbf{X}$.
@@ -488,11 +487,11 @@ inference}.
 
 \subsection{Unmeasured Confounding: E-Value}
 
-We start by computing the E-value~\cite{vanderweele2017}. This tells us the
+We compute the E-value~\cite{vanderweele2017}, which tells us the
 minimum risk-ratio an unmeasured confounder would need with \emph{both} smoking
-and infant mortality to fully wipe out our observed effect.
+and infant mortality to completely explain away our observed effect.
 
-Our baseline AIPW estimate implies a risk ratio of $1.32$ (that is,
+The baseline AIPW estimate implies a risk ratio of $1.32$ (that is,
 $(4.49 + 1.43)/4.49$). This gives an E-value of \textbf{1.97} for the point
 estimate and \textbf{1.31} for the lower confidence bound. But if we look at our
 preferred trimmed estimates, the implied risk ratios are much higher (1.75 and 1.52).

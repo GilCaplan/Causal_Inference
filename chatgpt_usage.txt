@@ -4,7 +4,7 @@ In the completion of this project, an AI assistant was used in the following way
 
 1. **Code Generation and Debugging**: AI was used to help write, structure, and troubleshoot the Python data analysis scripts (`estimation.py`), including setting up the estimators (IPW, Doubly Robust AIPW, and Propensity Score Matching) and generating the data visualizations (overlap histograms, Love plots, etc.).
 2. **Data Verification**: AI was used to write and run verification scripts to extract exact numbers (e.g., mortality rates, effective sample sizes, and caliper widths) from the script outputs and result CSVs, ensuring that all quantitative claims in the report exactly matched the underlying data.
-3. **Drafting and Editing**: AI was used as an editor to help draft and refine the prose of the LaTeX report (`report.tex`). Specifically, it was used to rewrite sections for clarity, natural phrasing, and varied sentence structures, moving away from overly rigid academic templates. 
+3. **Editing**: AI was used as an editor to help draft and refine the prose of the LaTeX report (`report.tex`). Specifically, it was used to rewrite sections for clarity, natural phrasing, and varied sentence structures, moving away from overly rigid academic templates. 
 4. **Formatting**: AI assisted with LaTeX formatting, including constructing tables, organizing figures, and generating the TikZ code for the causal DAG diagram.
 
 All generated code, analysis, and text were thoroughly reviewed, fact-checked against the raw data, and finalized by the author before submission.
