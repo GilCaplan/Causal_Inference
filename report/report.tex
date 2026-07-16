@@ -753,17 +753,19 @@ does not answer that question.
 
 \subsection{Comparison with Prior Literature}
 
-Our results line up nicely with the existing epidemiology literature. For instance,
-Yuan et al.~\cite{yuan2023} looked at a similar nationwide cohort and found adjusted
-odds ratios between 1.24 and 1.81. Our trimmed estimates imply risk ratios of
-$1.52$ to $1.75$, putting us squarely in the same ballpark.
+Our results line up nicely with the existing epidemiology literature. In fact,
+this specific research question has been studied using this exact same data source.
+Yuan et al.~\cite{yuan2023} looked at a five-year slice (2015--2019) of the same
+CDC Linked Birth/Infant Death dataset we used. They found adjusted odds ratios
+between 1.24 and 1.81 depending on smoking intensity. Our trimmed estimates
+imply risk ratios of $1.52$ to $1.75$, putting us squarely in the same ballpark.
 
-The difference is how we got there. Yuan et al.\ adjusted for birth weight and
-gestational age, which are post-treatment mediators. That kind of adjustment biases
-estimates toward the null. By building a formal causal graph, excluding those
-mediators, diagnosing our overlap issues, and running rigorous sensitivity checks,
-we've taken a well-known association and placed it on a much firmer causal
-foundation.
+The difference is how we got there. While Yuan et al.\ used the same data, they
+adjusted for birth weight and gestational age in their models. Those are
+post-treatment mediators, and adjusting for them biases the estimate toward the
+null. By building a formal causal graph, explicitly excluding those mediators,
+diagnosing our overlap issues, and running rigorous sensitivity checks, we've
+taken their finding and placed it on a much firmer causal foundation.
 
 
 % -------------------------------------------------------
